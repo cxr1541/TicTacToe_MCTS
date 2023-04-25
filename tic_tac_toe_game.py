@@ -1,7 +1,50 @@
+# let's say player o is the AI and player x is the human
+# let's say the maximum time for the AI to play his turn is 2 seconds
+from collections import defaultdict
+from abc import ABC, abstractmethod
+import math
+class MCTS:
+    def __init__(self):
+        self.V = defaultdict(int) #the total reward for each node
+        self.N = defaultdict(int) #the total times the node has been visited
+        self.children = dict(); #children of each node, for now we set the dictionnary as being empty
+    
+    def select(self, board_state):
+        pass
+   
+    def rollout(self, board_state):
+        pass
+
+    def rollout_policy(board_state):
+        pass
+
+    def choose_next_move(self,board_state):
+        #choosing the best sucessor out of all 
+        if board_state.is_terminal():
+            raise RuntimeError(f"choose_next_move was called when no more moves are possible {board_state}")
+        def score(n):
+            if self.N[n] == 0:
+                return float("-inf") 
+                #by doing this we are avoiding to choose before having explored the node
+            return self.V[n] / self.N[n] #this is the average number
+        return max(self.children[board_state], key = score)
+        #self.children[board_state] needs a row and a col function for the main to work and get the movment they want it to be
+    
+
 class TicTacToe:
     def __init__(self):
         self.board = [[" " for _ in range(3)] for _ in range(3)]
         self.current_player = 'X'
+
+    def available_play(self):
+        #list of the different available possible plays, we could make a list with all the different poissible move, so that we can pop that possibility when we want to expand that node
+       
+        list_of_possible_moves = []
+        for row in range(3):
+            for col in range(3):
+                if self.board[row][col] == " ":
+                    list_of_possible_moves.append((row,col))
+        return list_of_possible_moves[0]
 
     def print_board(self):
         """Print the current game board."""
@@ -48,11 +91,17 @@ class TicTacToe:
 
         print("Welcome to Tic-Tac-Toe!")
         self.print_board()
+        print(self.available_play())
 
         while True:
-            print(f"Player {self.current_player}, enter your move (row [1-3], column [1-3]):")
-            row = int(input("Enter row: ")) - 1
-            col = int(input("Enter column: ")) - 1
+            if self.current_player == "O":
+                print(f"Player {self.current_player} is playing, wait for him to enter his move")
+                row = MCTS.choose_next_move.row - 1
+                col = MCTS.choose_next_move.col - 1
+            else:
+                print(f"Player {self.current_player}, enter your move (row [1-3], column [1-3]):")
+                row = int(input("Enter row: ")) - 1
+                col = int(input("Enter column: ")) - 1
 
             self.play_move(row, col)
             self.print_board()
@@ -68,3 +117,9 @@ class TicTacToe:
 if __name__ == "__main__":
     game = TicTacToe()
     game.main()
+
+class board_state(ABC):
+    #these is what can be considered as a node. MCTS will create a tree of these nodes, expand from the current node and explore, simulate and backtrack
+    def __init__(self) -> None:
+        super().__init__()
+        pass
