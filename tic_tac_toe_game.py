@@ -10,7 +10,24 @@ class MCTS:
         self.children = dict(); #children of each node, for now we set the dictionnary as being empty
     
     def select(self, board_state):
-        pass
+        #starting at the root node
+        node = board_state
+
+        #traverse the tree until a leaf node is reached
+        while not node.is_terminal() and node is self.children:
+            #the UCB algorithm will select a child node to explore
+            _, node = max((self.V[child] / self.N[child] + math.sqrt(2*math.log(self.N[node])/self.N[child])
+                           for child in self.children[node]))
+        #expand the node if it hasnt been expanded yet and add it to the tree
+        if not node.is_terminal():
+            unexplored_moves = [move for move in node.get_possible_moves()
+                                if move not in self.children[node]]
+            #chooses the first unexplored move
+            move = unexplored_moves[0]
+            new_node = node.next_state(move)
+            self.children[node][move] = new_node
+            node = new_node
+        return node
    
     def rollout(self, board_state):
         pass
