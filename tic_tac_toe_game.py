@@ -1,5 +1,6 @@
 # let's say player o is the AI and player x is the human
 # let's say the maximum time for the AI to play his turn is 2 seconds
+import random
 from collections import defaultdict
 from abc import ABC, abstractmethod
 import math
@@ -22,7 +23,7 @@ class MCTS:
         if not node.is_terminal():
             unexplored_moves = [move for move in node.get_possible_moves()
                                 if move not in self.children[node]]
-            #chooses the first unexplored move
+            #chooses the first unexplored move should we keep it at the first option or make it random like the paper?
             move = unexplored_moves[0]
             new_node = node.next_state(move)
             self.children[node][move] = new_node
@@ -30,7 +31,26 @@ class MCTS:
         return node
    
     def rollout(self, board_state):
-        pass
+        #check if there is a winner in the current state
+        winner = board_state.check_winner()
+        if winner:
+            if winner == 'O':
+                return 1
+            else:
+                return 1
+
+            #if there is no winner continue playing
+        while not board_state.is_draw():
+            row, col = random.choice(board_state.avaliable_play())
+            board_state.play_move(row,col)
+            winner = board_state.check_winner()
+            if winner:
+                if winner == 'O':
+                    return 1
+                else:
+                    return -1
+        return 0
+
 
     def rollout_policy(board_state):
         pass
