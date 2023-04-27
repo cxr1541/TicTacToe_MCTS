@@ -9,11 +9,9 @@ class MCTS:
         self.V = defaultdict(int) #the total reward for each node
         self.N = defaultdict(int) #the total times the node has been visited
         self.children = dict(); #children of each node, for now we set the dictionnary as being empty
-    
     def select(self, board_state):
         #starting at the root node
         node = board_state
-
         #traverse the tree until a leaf node is reached
         while not node.is_terminal() and node is self.children:
             #the UCB algorithm will select a child node to explore
@@ -38,7 +36,6 @@ class MCTS:
                 return 1
             else:
                 return 1
-
             #if there is no winner continue playing
         while not board_state.is_draw():
             row, col = random.choice(board_state.avaliable_play())
@@ -49,12 +46,10 @@ class MCTS:
                     return 1
                 else:
                     return -1
-        return 0
-
-
+        return 00
     def rollout_policy(board_state):
-        pass
-
+        #returns a random valid move for the given board state
+        return random.choice(board_state.avaliable_play())
     def choose_next_move(self,board_state):
         #choosing the best sucessor out of all 
         if board_state.is_terminal():
@@ -66,13 +61,10 @@ class MCTS:
             return self.V[n] / self.N[n] #this is the average number
         return max(self.children[board_state], key = score)
         #self.children[board_state] needs a row and a col function for the main to work and get the movment they want it to be
-    
-
 class TicTacToe:
     def __init__(self):
         self.board = [[" " for _ in range(3)] for _ in range(3)]
         self.current_player = 'X'
-
     def available_play(self):
         #list of the different available possible plays, we could make a list with all the different poissible move, so that we can pop that possibility when we want to expand that node
        
@@ -82,7 +74,6 @@ class TicTacToe:
                 if self.board[row][col] == " ":
                     list_of_possible_moves.append((row,col))
         return list_of_possible_moves[0]
-
     def print_board(self):
         """Print the current game board."""
         for row in self.board:
@@ -159,4 +150,4 @@ class board_state(ABC):
     #these is what can be considered as a node. MCTS will create a tree of these nodes, expand from the current node and explore, simulate and backtrack
     def __init__(self) -> None:
         super().__init__()
-        pass
+
