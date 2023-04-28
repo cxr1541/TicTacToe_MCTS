@@ -121,6 +121,7 @@ class TicTacToe:
         self.print_board()
         print(self.available_play())
 
+
         while True:
             if self.current_player == "O":
                 print(f"Player {self.current_player} is playing, wait for him to enter his move")
