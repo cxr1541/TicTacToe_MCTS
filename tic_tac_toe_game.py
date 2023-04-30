@@ -11,27 +11,43 @@ class MCTS:
         self.children = dict(); #children of each node, for now we set the dictionnary as being empty
 
     def select(self, board_state):
-        # starting at the root node
-        node = board_state
+    # starting at the root node
+      node = board_state
+  
+      # traverse the tree until a leaf node is reached
+      while not node.check_winner() and node in self.children:
+          # the UCB algorithm will select a child node to explore
+          if node not in self.children:
+              # add the node to the tree and expand it
+              self.children[node] = {move: node.next_state(move) for move in node.get_possible_moves()}
+          else:
+              _, node = max(((self.V[child] / self.N[child]) + math.sqrt(2 * math.log(self.N[node]) / self.N[child]), child) for child in self.children[node])
+  
+          # perform some action on the child node
+  
+          # expand the node if it hasn't been expanded yet and add it to the tree
+          if not node.check_winner():
+              unexplored_moves = [move for move in node.get_possible_moves() if move not in self.children[node]]
+              # chooses unexplored move randomly
+              if unexplored_moves:
+                  move = random.choice(unexplored_moves)
+                  new_node = node.next_state(move)
+                  self.children[node][move] = new_node
+                  node = new_node
+  
+      return node
 
-        # traverse the tree until a leaf node is reached
-        while not node.check_winner() and node not in self.children:
-            # the UCB algorithm will select a child node to explore
-            _, node = max((self.V[child] / self.N[child] + math.sqrt(2 * math.log(self.N[node]) / self.N[child]), child)
-                          for child in self.children[node])
-
-        # expand the node if it hasn't been expanded yet and add it to the tree
-        if not node.check_winner():
-            unexplored_moves = [move for move in node.get_possible_moves()
-                                if move not in self.children[node]]
-            # chooses unexplored move randomly
-            if unexplored_moves:
-                move = random.choice(unexplored_moves)
-                new_node = node.next_state(move)
-                self.children[node][move] = new_node
-                node = new_node
-
-        return node
+    def backpropagate(self, node, score):
+        # update nodes's up to root node
+        while node is not None:
+            # update node's visits
+            node.visits += 1
+            
+            # update node's score
+            node.score += score
+            
+            # set node to parent
+            node = node.parent
    
     def rollout(self, board_state):
         #check if there is a winner in the current state
@@ -43,7 +59,7 @@ class MCTS:
                 return 1
             #if there is no winner continue playing
         while not board_state.is_draw():
-            row, col = random.choice(board_state.avaliable_play())
+            row, col = random.choice(board_state.available_play())
             board_state.play_move(row,col)
             winner = board_state.check_winner()
             if winner:
@@ -54,7 +70,7 @@ class MCTS:
         return 0
     def rollout_policy(board_state):
         #returns a random valid move for the given board state
-        return random.choice(board_state.avaliable_play())
+        return random.choice(board_state.available_play())
     def choose_next_move(self,board_state):
         #choosing the best sucessor out of all 
         if board_state.check_winner():
@@ -130,8 +146,10 @@ class TicTacToe:
 
         while not self.is_draw():
             if self.current_player == 'X':
-                row, col = input("Enter cell for X (row, col): ")
-                row, col = int(row), int(col)
+                #row, col = input("Enter cell for X (row, col): ").split()
+                #row, col = int(row), int(col)
+                row = int(input("Enter row: "))
+                col = int(input("Enter col: "))
             else:
                 print("Thinking...")
                 mcts = MCTS()
