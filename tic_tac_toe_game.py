@@ -4,6 +4,17 @@ import random
 from collections import defaultdict
 from abc import ABC, abstractmethod
 import math
+
+class Node:
+    def __init__(self, state, parent=None, move=None):
+        self.state = state
+        self.visits = 0
+        self.wins = 0
+        self.children = {}
+
+        print("Created node with state:")
+        print(self.state)
+
 class MCTS:
     def __init__(self):
         self.V = defaultdict(int) #the total reward for each node
@@ -48,6 +59,7 @@ class MCTS:
             
             # set node to parent
             node = node.parent
+
    
     def rollout(self, board_state):
         #check if there is a winner in the current state
@@ -82,27 +94,34 @@ class MCTS:
             return self.V[n] / self.N[n] #this is the average number
         return max(self.children[board_state], key = score)
         #self.children[board_state] needs a row and a col function for the main to work and get the movment they want it to be
+
 class TicTacToe:
+    # initialize tic tac toe board
     def __init__(self):
+        # creates a 2D list of size 3x3
         self.board = [[" " for _ in range(3)] for _ in range(3)]
+        # player is X
         self.current_player = 'X'
+
+    # all moves that are currently available
     def available_play(self):
-        #list of the different available possible plays, we could make a list with all the different poissible move, so that we can pop that possibility when we want to expand that node
-       
+        # list of the different available possible plays, we could make a list with all the different poissible move, so that we can pop that possibility when we want to expand that node
         list_of_possible_moves = []
         for row in range(3):
             for col in range(3):
                 if self.board[row][col] == " ":
+                    #add moves to the list
                     list_of_possible_moves.append((row,col))
         return list_of_possible_moves
+    
+    # print the current game board
     def print_board(self):
-        """Print the current game board."""
         for row in self.board:
             print(" | ".join(row))
             print("-" * 9)
 
+    # check if there is a winner
     def check_winner(self):
-        """Check if there's a winner."""
         # Check rows
         for row in self.board:
             if row[0] == row[1] == row[2] and row[0] != " ":
@@ -121,23 +140,29 @@ class TicTacToe:
 
         return None
 
+    #check if there is a draw
     def is_draw(self):
-        """Check if the game is a draw."""
         for row in self.board:
             if " " in row:
                 return False
         return True
     
+    # play move
     def play_move(self, row, col):
+        # check if move is valid
         if row < 0 or row > 2 or col < 0 or col > 2 or self.board[row][col] != " ":
             print("Invalid move. Try again.")
+        
         else:
+            # assign current player to grid they select
             self.board[row][col] = self.current_player
+            #swap players since player and AI take turns 
             self.current_player = "X" if self.current_player == "O" else "O"
 
+    # Main function to run the game
     def main(self):
-        """Main function to run the game."""
 
+        
         print("Welcome to Tic-Tac-Toe!")
         print("X goes first.")
         print("The cells are numbered from 0 to 8 as shown below.")
@@ -146,8 +171,6 @@ class TicTacToe:
 
         while not self.is_draw():
             if self.current_player == 'X':
-                #row, col = input("Enter cell for X (row, col): ").split()
-                #row, col = int(row), int(col)
                 row = int(input("Enter row: "))
                 col = int(input("Enter col: "))
             else:
@@ -158,7 +181,7 @@ class TicTacToe:
                     mcts.N[node] += 1
                     leaf = mcts.select(node)
                     reward = mcts.rollout(leaf)
-                    mcts.backpropagate(leaf, reward)
+                    #mcts.backpropagate(leaf, reward)
                 row, col = mcts.choose_next_move(node)
                 print(f"AI plays {row}, {col}")
 
@@ -172,20 +195,13 @@ class TicTacToe:
 
         print("Draw.")
 
-class Node:
-    def __init__(self, state):
-        self.state = state
-        self.visits = 0
-        self.wins = 0
-        self.children = {}
-
-        print("Created node with state:")
-        print(self.state)
 
 
 
 if __name__ == "__main__":
+    #create tic tac toe board
     game = TicTacToe()
+    #start the game
     game.main()
 
 class board_state(ABC):
