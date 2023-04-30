@@ -162,32 +162,53 @@ class TicTacToe:
     # Main function to run the game
     def main(self):
 
-        
+        # print welcome
         print("Welcome to Tic-Tac-Toe!")
         print("X goes first.")
-        print("The cells are numbered from 0 to 8 as shown below.")
+
+        #print board
         self.print_board()
+
+        #print available moves
         print(self.available_play())
 
+        #initialize MCTS class, class should be here our we keep creating the class over
+        mcts = MCTS()
+
+        # while game is not a draw, do:
         while not self.is_draw():
+            # player's turn to pick row and col
             if self.current_player == 'X':
                 row = int(input("Enter row: "))
                 col = int(input("Enter col: "))
+            # AI's turn 
             else:
-                print("Thinking...")
-                mcts = MCTS()
-                node = self
-                for i in range(1000):
-                    mcts.N[node] += 1
-                    leaf = mcts.select(node)
-                    reward = mcts.rollout(leaf)
+                print("AI is computing move...")
+                
+                # this code is causing some error, I think this should be written in the MCTS class tbh
+                ##for i in range(1000):
+                    #mcts.N[node] += 1
+                    #leaf = mcts.select(node)
+                    #reward = mcts.rollout(leaf)
                     #mcts.backpropagate(leaf, reward)
-                row, col = mcts.choose_next_move(node)
+                #row, col = mcts.choose_next_move(node)
+
+            
+                # search for the best move
+                best_move = mcts.search(self)
+
+                # make AI move here
+                self = best_move.board
+
                 print(f"AI plays {row}, {col}")
 
+            # player makes mmove on the board
             self.play_move(row, col)
+
+            # print board
             self.print_board()
 
+            # check if there is a winner
             winner = self.check_winner()
             if winner:
                 print(f"{winner} wins!")
