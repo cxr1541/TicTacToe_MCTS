@@ -5,21 +5,58 @@ from collections import defaultdict
 from abc import ABC, abstractmethod
 import math
 
+# Node Tree class 
 class Node:
-    def __init__(self, state, parent=None, move=None):
-        self.state = state
+    # Node Tree constructor
+    def __init__(self, board_state, parent):
+        # Initalize board state
+        self.board_state = board_state
+
+        # Initalize parent node
+        self.parent = parent
+
+        # Initialze number of visit 
         self.visits = 0
-        self.wins = 0
+
+        # Initialize score of the node, higher the score the most likely it will be chosen
+        self.score = 0
+
+        # Initialize node's children
         self.children = {}
 
         print("Created node with state:")
-        print(self.state)
+        print(self.board_state)
 
+# Monte Carlo Tree Search Class
 class MCTS:
-    def __init__(self):
-        self.V = defaultdict(int) #the total reward for each node
-        self.N = defaultdict(int) #the total times the node has been visited
-        self.children = dict(); #children of each node, for now we set the dictionnary as being empty
+    # remove this because this should be tied the nodes, not the actual algorithm 
+    #def __init__(self):
+        #self.V = defaultdict(int) #the total reward for each node
+        #self.N = defaultdict(int) #the total times the node has been visited
+        #self.children = dict(); #children of each node, for now we set the dictionnary as being empty
+
+    # added the search loop here because it made sense
+    def search(self, starting_state):
+        # create node tree
+        self.root = Node(starting_state, None)
+
+        # iterate X amount of times
+        for iteration in range(1000):
+            # Selection Phase, Expansion Phase in the select function
+            node = self.select(self.root)
+            
+            # Simulation Phase
+            score = self.rollout(node.board)
+            
+            # Backpropagate Phase
+            self.backpropagate(node, score)
+        
+        # pick the AI's best move
+        try:
+            return self.choose_next_move(self.root, 0)
+        
+        except:
+            pass
 
     def select(self, board_state):
     # starting at the root node
@@ -194,13 +231,11 @@ class TicTacToe:
                 #row, col = mcts.choose_next_move(node)
 
             
-                # search for the best move
-                best_move = mcts.search(self)
-
+                # search for the ai's move here
+                AI_move = mcts.search(self)
                 # make AI move here
-                self = best_move.board
 
-                print(f"AI plays {row}, {col}")
+                #print(f"AI plays {row}, {col}")
 
             # player makes mmove on the board
             self.play_move(row, col)
